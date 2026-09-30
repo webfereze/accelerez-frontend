@@ -28,7 +28,15 @@ export function useViewer(): { viewer: AuthUser | null; ready: boolean } {
   const [ready, setReady] = useState(cached !== undefined);
 
   useEffect(() => {
-    if (cached !== undefined) return;
+    // Another consumer answered after this one rendered — the header and the
+    // side panel mount together, and whichever effect runs second found the
+    // cache filled and never became ready, so the header's account link never
+    // appeared on a desktop.
+    if (cached !== undefined) {
+      setViewer(cached);
+      setReady(true);
+      return;
+    }
 
     let cancelled = false;
 

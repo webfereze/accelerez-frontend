@@ -78,12 +78,12 @@ export default function Drawer({
         aria-label={label}
         inert={!open}
         className={clsx(
-          "fixed inset-y-0 right-0 z-[90] flex w-full max-w-sm flex-col overflow-y-auto bg-ink-950 px-8 py-8 text-ink-200",
+          "fixed inset-y-0 right-0 z-[90] flex w-full flex-col overflow-y-auto overscroll-contain bg-ink-950 px-5 py-5 text-ink-200 sm:max-w-sm sm:px-8 sm:py-8",
           "transition-transform duration-500 ease-out motion-reduce:transition-none",
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
-        <div className="mb-10 flex shrink-0 items-center justify-between gap-4">
+        <div className="mb-8 flex shrink-0 items-center justify-between gap-4 sm:mb-10">
           <div className="min-w-0">{header}</div>
           <button
             ref={closeButton}

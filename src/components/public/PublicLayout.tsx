@@ -48,8 +48,9 @@ import type { SiteChrome } from "@/utils/site";
  * identity marks together on the left and the things a reader acts on together
  * on the other side.
  *
- * The hamburger is back to narrow screens only. Six links, a logo and a globe
- * do not fit on one line below `lg` at any type size worth reading, and there
+ * The hamburger is back to narrow screens only. Six links, the account, a
+ * logo and a globe do not fit on one line below `xl` at any type size worth
+ * reading, and there
  * it opens the side panel — which now carries the navigation and the languages
  * and nothing else.
  *
@@ -115,8 +116,12 @@ export default function PublicLayout({
             scrolled ? "border-b border-white/10" : "border-b border-transparent",
           )}
         >
-          <div className="site-container flex h-[4.5rem] items-center gap-8 md:h-[5.5rem]">
-            <Link href="/" className="shrink-0 text-ink-50">
+          {/* Mobile first: logo, then the bag and the menu button pushed right, with
+              tight gaps. The six links, the account and the globe need more
+              room than a phone has — at 360px the old row was ~440px wide and
+              pushed the menu button off the screen. */}
+          <div className="site-container flex h-[4.5rem] items-center gap-2 sm:gap-4 md:h-[5.5rem] xl:gap-8">
+            <Link href="/" className="min-w-0 shrink text-ink-50 sm:shrink-0">
               {/* The file in `public/brand/` unless the CMS has been given one.
                   A brand mark is a file somebody drops in, not something worth
                   a round trip through an upload form — but the setting still
@@ -130,13 +135,16 @@ export default function PublicLayout({
                 // 1920×1920 with the logo floating in the middle of it, so a
                 // 56px box rendered a 15px wordmark; the file is now trimmed to
                 // the ink and this is the height of the logo itself.
-                className="h-9 w-auto md:h-11"
+                className="h-7 w-auto sm:h-9 md:h-11"
               />
             </Link>
 
-            <LocaleMenu alternates={alternates} />
+            {/* From `sm` up; on a phone the languages are in the menu panel. */}
+            <div className="hidden sm:block">
+              <LocaleMenu alternates={alternates} />
+            </div>
 
-            <nav className="ml-auto hidden items-center gap-8 lg:flex">
+            <nav className="ml-auto hidden items-center gap-7 xl:flex">
               {chrome.main.map((item) => {
                 const current =
                   path === item.href ||
@@ -148,7 +156,7 @@ export default function PublicLayout({
                     href={item.href}
                     aria-current={current ? "page" : undefined}
                     className={clsx(
-                      "relative py-1 text-[0.95rem] font-medium transition-colors duration-200",
+                      "relative whitespace-nowrap py-1 text-[0.95rem] font-medium transition-colors duration-200",
                       current ? "text-ink-50" : "text-ink-400 hover:text-ink-50",
                     )}
                   >
@@ -175,7 +183,7 @@ export default function PublicLayout({
             {ready && (
               <Link
                 href={viewer ? areaFor(viewer.role) : "/autentificare"}
-                className="ml-auto hidden min-h-10 items-center gap-2 rounded-full border border-white/15 px-4 text-sm font-medium text-white transition-colors hover:border-acid-500 hover:text-acid-400 lg:inline-flex"
+                className="hidden min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-white/15 px-4 text-sm font-medium text-white transition-colors hover:border-acid-500 hover:text-acid-400 xl:inline-flex"
               >
                 <UserCircleIcon className="h-4 w-4" aria-hidden />
                 {viewer
@@ -186,21 +194,27 @@ export default function PublicLayout({
 
             {/* The bag: after the account on a desktop, beside the menu
                 button on a phone — on every screen, see `CartButton`. */}
-            <CartButton className="ml-auto lg:ml-3" />
+            <CartButton className="ml-auto shrink-0 xl:ml-0" />
 
             <button
               type="button"
               onClick={() => setPanelOpen(true)}
               aria-expanded={panelOpen}
               aria-label={t("nav.menu")}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-ink-100 transition-colors hover:bg-ink-900/5 lg:hidden"
+              className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink-100 transition-colors hover:bg-white/10 hover:text-white xl:hidden"
             >
               <Bars3Icon className="h-6 w-6" aria-hidden />
             </button>
           </div>
         </header>
 
-        <SidePanel open={panelOpen} onClose={closePanel} items={chrome.main} />
+        <SidePanel
+          open={panelOpen}
+          onClose={closePanel}
+          items={chrome.main}
+          logo={chrome.site.logo || "/brand/logo-accelerez.png"}
+          siteName={siteName}
+        />
         <CartDrawer />
 
         {/* Every page clears the fixed header — the hero no longer runs under
