@@ -1,0 +1,127 @@
+/**
+ * Acceleratorul de Rezultate — the colour scales.
+ *
+ * Tailwind 4 takes its theme from CSS, not from a config file — there is no
+ * `tailwind.config.ts`. Every component refers to a scale, never to a hex, so a
+ * rebrand is this file and nothing else.
+ *
+ * **Black ground, one neon green, one pink.** The palette is not invented here:
+ * `acid-500` is `#00ea54`, sampled straight out of `public/brand/logo-accelerez.png`,
+ * and the logo is white-and-green on transparency — a mark drawn for a dark
+ * page. A light site would have to put a box around its own logo, which is the
+ * clearest possible sign the ground is wrong.
+ *
+ * Three colours doing three jobs, and the jobs are decided by contrast rather
+ * than by taste:
+ *
+ * - `ink` is the ground and the type. `950` is the page, `900` the card that
+ *   sits on it, `50`–`200` the text printed on both. Very slightly green-black,
+ *   so a dark surface reads as related to the mark rather than as grey chrome.
+ *
+ * - `acid` is the green, and it is what **fills**: the primary button, the
+ *   progress bar, the mark beside a heading. **Always with `ink-950` type on
+ *   it, never white.** White on `#00ea54` is about 1.6:1 and is illegible; the
+ *   near-black clears 12:1. A neon button with white text is the single most
+ *   common way a palette like this goes wrong, and it looks fine on the
+ *   designer's screen because they already know what it says.
+ *
+ * - `flare` is the pink, and it is the **second** voice — never a second
+ *   primary. It marks the things the green must not: a pending state, a
+ *   warning, the "this month is not paid" band, one word inside a heading. On
+ *   the dark ground `flare-500` is 5.7:1 as text and correct; on a pink fill
+ *   the type is `ink-950`, because white on it is 3.5:1 and passes only at
+ *   heading sizes.
+ *
+ * Two accents is the design. A third would mean the product cannot decide
+ * which state is urgent, and a status colour that is merely decorative stops
+ * being read at all.
+ *
+ * All eleven steps of each scale are defined even where the design needs two:
+ * components reach for the light end on hover and the dark end on active, and
+ * a missing step is an invisible element.
+ */
+
+@theme {
+  /* Ink — the ground, the surfaces, and the type printed on them. */
+  --color-ink-50: #f4f6f5;
+  --color-ink-100: #e5e9e7;
+  --color-ink-200: #c9d0cd;
+  --color-ink-300: #a4aeaa;
+  --color-ink-400: #7a8480;
+  --color-ink-500: #5e6866;
+  --color-ink-600: #4a5351;
+  --color-ink-700: #3c4341;
+  --color-ink-800: #292e2d;
+  --color-ink-900: #16191a;
+  --color-ink-950: #0a0c0c;
+
+  /* Acid — the brand green, straight from the logo. `500` fills; on a light
+     surface use `700` for text, where it clears 4.6:1 (`500` is 1.6:1). */
+  --color-acid-50: #e8fff0;
+  --color-acid-100: #c4ffdb;
+  --color-acid-200: #8affbc;
+  --color-acid-300: #47fb99;
+  --color-acid-400: #11f177;
+  --color-acid-500: #00ea54;
+  --color-acid-600: #00bf45;
+  --color-acid-700: #009638;
+  --color-acid-800: #04752f;
+  --color-acid-900: #075f29;
+  --color-acid-950: #003714;
+
+  /* Flare — the pink. The second voice: states, marks, one word in a heading.
+     Never a second primary button. */
+  --color-flare-50: #fff0f6;
+  --color-flare-100: #ffe1ec;
+  --color-flare-200: #ffc3da;
+  --color-flare-300: #ff95bf;
+  --color-flare-400: #ff5da2;
+  --color-flare-500: #ff2e88;
+  --color-flare-600: #ed0a68;
+  --color-flare-700: #c50053;
+  --color-flare-800: #a30347;
+  --color-flare-900: #87073f;
+  --color-flare-950: #52001f;
+
+  /* Primary — the **admin's** action colour, and the dark ground a public
+     component reaches for on hover.
+
+     Deliberately a charcoal rather than the brand green. The house rule is that
+     the admin has one look across every project — light surfaces, grey
+     neutrals, a near-black pill for the active row — and the neon would be a
+     second brand colour shouting on the only screens somebody uses for hours.
+     The site's art direction stops at `/admin`. */
+  --color-primary-50: #f4f5f6;
+  --color-primary-100: #e6e8ea;
+  --color-primary-200: #cbcfd3;
+  --color-primary-300: #a6acb3;
+  --color-primary-400: #7c838c;
+  --color-primary-500: #5f666f;
+  --color-primary-600: #4a5058;
+  --color-primary-700: #383d44;
+  --color-primary-800: #262a30;
+  --color-primary-900: #1a1d21;
+  --color-primary-950: #101215;
+
+  /* Corners — **two named tokens, and Tailwind's own scale left alone.**
+     `rounded-panel` is the large one: the hero, a full-width photograph, the
+     footer. `rounded-card` is the tile it contains. Buttons are pills and need
+     no token.
+
+     Named rather than set by redefining `--radius-lg` and `--radius-xl`: the
+     admin is built on the same utilities, so widening `xl` would give every
+     panel, dialog and list in `/admin` the site's corners. */
+  --radius-card: 0.875rem;
+  --radius-panel: 1.75rem;
+
+  /**
+   * The two faces, named by role rather than by family — swapping either is
+   * `fonts.ts` alone.
+   *
+   * `--font-head`, never `--font-display`: the latter collides with the CSS
+   * `font-display` descriptor and Tailwind silently emits no utility for it,
+   * so every heading falls back to the body face with no error anywhere.
+   */
+  --font-head: var(--font-display-face), "Archivo", system-ui, sans-serif;
+  --font-sans: var(--font-sans-face), "Manrope", system-ui, sans-serif;
+}

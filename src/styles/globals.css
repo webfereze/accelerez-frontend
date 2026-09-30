@@ -1,0 +1,293 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+/**
+ * **The page is black, and that is a decision the logo made.**
+ *
+ * `public/brand/logo-accelerez.png` is white and neon green on transparency —
+ * a mark drawn for a dark ground. On a light page it needs a box around itself,
+ * which is the clearest possible sign the ground is wrong.
+ *
+ * So the body is near-black, type is light, and a section that wants to stand
+ * out paints a *lighter* band rather than a darker one. The inversion is
+ * declared once here; a block that forgets it inherits correctly instead of
+ * vanishing.
+ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+
+    /**
+     * **No sideways scroll, ever.**
+     *
+     * Several blocks deliberately place things outside their own box — the dark
+     * caption slab overlaps the corner of a picture, an overlapping pair of
+     * photographs sits proud of its column. All of that is the design, and all
+     * of it widens the document on a narrow screen unless something clips it.
+     *
+     * `clip`, not `hidden`. `overflow: hidden` on an ancestor silently kills
+     * `position: sticky` inside it — which here would be the header, the FAQ
+     * title and the admin's settings rail — and turns the page into a scroll
+     * container of its own. `clip` cuts the overflow and changes nothing else.
+     */
+    overflow-x: clip;
+  }
+
+  /* Somebody who asked their system not to animate meant it. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /**
+   * Body copy is the quiet face; headings ask for the loud one.
+   *
+   * The default is Manrope, and every heading opts into Archivo with
+   * `font-head`. Set this the other way round — display face on the body,
+   * headings inheriting — and a paragraph of heavy Archivo at 16px is tiring to
+   * read for the four sentences a landing page actually contains.
+   */
+  body {
+    background-color: var(--color-ink-950);
+    color: var(--color-ink-200);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /**
+   * Display type is tight and heavy, once, here.
+   *
+   * Every heading in this art direction is the same object: Archivo at 700,
+   * tracking pulled in, leading just over 1. Repeating those four declarations
+   * on forty headings is how three of them drift.
+   */
+  .font-head {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+  }
+
+  /* A visible focus ring everywhere, not only where somebody remembered. */
+  :focus-visible {
+    outline: 2px solid var(--color-acid-500);
+    outline-offset: 2px;
+  }
+}
+
+/**
+ * The inset frame.
+ *
+ * Large panels — the hero, a photograph that wants the full width — sit inside
+ * a small margin rather than bleeding to the glass, which is what makes them
+ * read as objects laid on the page instead of as sections of it.
+ *
+ * A utility rather than a class on each block, because the inset has to be the
+ * same number everywhere or the panels stop lining up down the page.
+ */
+@utility framed {
+  padding-inline: 0.75rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 1.25rem;
+  }
+}
+
+/**
+ * The hero's own frame numbers, duplicated in `HeroBlock`'s height calculation
+ * because CSS `calc()` cannot read another rule's padding. Changing the inset
+ * above means changing that too, or the panel stops clearing the fold by
+ * exactly the difference.
+ */
+
+/**
+ * The page gutter. Header, hero text and every block use it, and that is what
+ * makes everything line up down the page.
+ */
+@utility site-container {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 88rem;
+  padding-inline: 1rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/**
+ * Hero motion.
+ *
+ * Three named animations rather than utility classes, because each is used on
+ * a dozen elements with a different delay and the delay is the choreography.
+ *
+ * All of them are **additive**: the element's resting state is the visible one,
+ * and the animation moves it *into* that state from an offset. An animation
+ * that leaves an element at `opacity: 0` when it never runs is an invisible
+ * page, and it never runs for a reader who asked for reduced motion — whose
+ * durations the base layer above already collapses to nothing.
+ */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.9em);
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes hero-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(0.35rem);
+    opacity: 1;
+  }
+}
+
+@layer components {
+  .hero-rise {
+    animation: hero-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  /* Very slow, and only ever on a still: it should read as "this is footage"
+     without a reader ever catching it moving. */
+  .ken-burns {
+    animation: ken-burns 22s ease-out forwards;
+  }
+
+  .hero-cue {
+    animation: hero-cue 2.4s ease-in-out infinite;
+  }
+}
+
+/**
+ * The dark band a block can bring with it.
+ *
+ * Declared here rather than as a Tailwind utility because it does two things at
+ * once: it paints the ground *and* re-points the type colours inside it. A
+ * block that opted into `dark` should not also have to remember to invert every
+ * heading, rule and muted line it contains — that is how one un-inverted
+ * element ends up invisible on a dark section.
+ *
+ * Scoped with `:where()` so it adds no specificity: a renderer that sets its
+ * own colour on an element still wins.
+ */
+@layer components {
+  .block-dark {
+    background-color: #000;
+    color: var(--color-ink-200);
+  }
+
+  .block-dark :where(h1, h2, h3, h4) {
+    color: var(--color-ink-50);
+  }
+
+  .block-dark :where(p, li, dd, summary) {
+    color: var(--color-ink-300);
+  }
+
+  .block-dark :where(a:not([class*="bg-"])) {
+    color: var(--color-ink-50);
+  }
+
+  .block-dark :where(hr) {
+    border-color: rgb(255 255 255 / 0.15);
+  }
+
+  /**
+   * The one *light* band on a dark page.
+   *
+   * It exists because an unbroken black scroll flattens — the eye needs
+   * somewhere to rest — and because a long form is easier to fill in on a light
+   * surface. It re-points its own type colours for the same reason
+   * `.block-dark` does.
+   */
+  .block-light {
+    background-color: var(--color-ink-50);
+    color: var(--color-ink-800);
+  }
+
+  .block-light :where(h1, h2, h3, h4) {
+    color: var(--color-ink-950);
+  }
+
+  .block-light :where(p, li, dd, summary) {
+    color: var(--color-ink-700);
+  }
+
+  .block-light :where(a:not([class*="bg-"])) {
+    color: var(--color-ink-950);
+  }
+
+  .block-light :where(hr) {
+    border-color: rgb(10 12 12 / 0.12);
+  }
+}
+
+/**
+ * The admin keeps the neutral sans.
+ *
+ * Deliberately not the site's face: the admin is a tool used for hours, where
+ * the content is data in dense rows and forms. A display serif at 13px in a
+ * table is harder to scan, and the house rule is already that the admin has its
+ * own look — light surfaces, `gray` neutrals — which is not the site's.
+ */
+@layer base {
+  .admin-shell,
+  .admin-shell input,
+  .admin-shell select,
+  .admin-shell textarea,
+  .admin-shell button {
+    font-family: var(--font-sans);
+  }
+}
+
+/**
+ * The neon band.
+ *
+ * Green ground with near-black type on it — **white on this green is about
+ * 1.6:1 and illegible**, and it is the mistake this rule exists to make
+ * impossible. Like `.block-dark` it re-points the type colours inside itself
+ * with `:where()`, so a block that opts in does not also have to remember to
+ * invert every heading and muted line it contains.
+ *
+ * One of these per page, at most. A second neon band and neither is loud.
+ */
+@layer components {
+  .block-acid {
+    background-color: var(--color-acid-500);
+    color: var(--color-ink-950);
+  }
+
+  .block-acid :where(h1, h2, h3, h4) {
+    color: var(--color-ink-950);
+  }
+
+  .block-acid :where(p, li, dd, label) {
+    color: var(--color-ink-800);
+  }
+
+  .block-acid :where(input, textarea) {
+    background-color: rgb(255 255 255 / 0.85);
+    border-color: rgb(16 12 10 / 0.25);
+    color: var(--color-ink-950);
+  }
+}
