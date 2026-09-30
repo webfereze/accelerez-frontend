@@ -53,6 +53,17 @@ module.exports = {
   // anyone else.
   poweredByHeader: false,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
+  /**
+   * The translation files ride along into every server function.
+   *
+   * next-i18next reads `public/locales` from disk at request time, which the
+   * bundler cannot see, so a page rendered on demand (`fallback: "blocking"`)
+   * found no translations on Vercel and printed every key raw — while the
+   * pages prerendered at build time, where the files are on disk, looked fine.
+   */
+  outputFileTracingIncludes: {
+    "/**": ["./public/locales/**/*"],
+  },
   images: {
     /**
      * **Development only.** Next 16 refuses to optimise an image whose host
